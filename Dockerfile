@@ -4,7 +4,7 @@ WORKDIR /app
 COPY pom.xml ./
 COPY settings.xml ./
 COPY src ./src
-RUN echo "rm -rf ~/.m2/repository/* && GITHUB_USER: $GITHUB_USER" && echo "GITHUB_TOKEN: $GITHUB_TOKEN" && mvn clean install -X -U && mvn package -Dmaven.test.skip=true -s settings.xml
+RUN rm -rf ~/.m2/repository/* && echo "GITHUB_USER: $GITHUB_USER" && echo "GITHUB_TOKEN: $GITHUB_TOKEN" && mvn clean install -X -U && mvn package -Dmaven.test.skip=true -s settings.xml
 
 FROM openjdk:23-jdk-slim
 WORKDIR /app
