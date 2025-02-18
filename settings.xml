@@ -28,8 +28,8 @@
   <servers>
     <server>
       <id>github</id>
-      <username>env.${GITHUB_USER}</username>
-      <password>env.${GITHUB_TOKEN}</password>
+      <username>wangxued</username>
+      <password>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</password>
     </server>
   </servers>
 
