@@ -1,0 +1,5 @@
+{
+    "ignore_dockerfile": true,
+    "build_command": "mvn clean install -X -U -s settings.xml && mvn package -Dmaven.test.skip=true -s settings.xml",
+    "start_command": "java -Xms128m -Xmx1024m -javaagent:grafana-opentelemetry-java-v2.12.0.jar -jar app.jar"
+}
