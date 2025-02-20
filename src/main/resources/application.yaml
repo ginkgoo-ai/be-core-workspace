@@ -3,7 +3,7 @@ core-messaging-uri: ${SERVICE_SCHEME}://${CORE_IDENTITY_HOST}:${CORE_IDENTITY_PO
 core-gateway-uri: ${SERVICE_SCHEME}://${CORE_GATEWAY_HOST}:${CORE_GATEWAY_PORT}
 
 server:
-  port: 8083
+  port: 8080
   shutdown: graceful
 
 spring:
