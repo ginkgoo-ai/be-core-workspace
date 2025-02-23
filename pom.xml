@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>com.ginkgooai</groupId>
-    <artifactId>core-workspace</artifactId>
+    <artifactId>be-core-workspace</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>core-workspace</name>
     <description>ginkgooai-core-workspace</description>
@@ -104,6 +104,17 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+        </dependency>
+
+        <!-- Flyway -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
 
         <!-- JWT -->

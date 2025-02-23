@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,7 +17,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "Workspace Members", description = "APIs for managing workspace members")
 public class WorkspaceMemberController {
+    
     private final WorkspaceServiceImpl workspaceService;
+    
+    private final HttpSession httpSession;
 
     @Operation(
             summary = "Update member's last access time",
@@ -36,11 +40,12 @@ public class WorkspaceMemberController {
     )
     @PatchMapping("/access")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateLastAccess(
-            @Parameter(description = "Workspace ID")
-            @PathVariable String workspaceId,
-            @AuthenticationPrincipal Jwt jwt
-    ) {
+    public void updateLastAccess(@Parameter(description = "Workspace ID")
+                                 @PathVariable String workspaceId,
+                                 @AuthenticationPrincipal Jwt jwt) {
+
         workspaceService.updateMemberLastAccess(workspaceId, jwt.getSubject());
+
+        httpSession.setAttribute("CURRENT_WORKSPACE_ID", workspaceId);
     }
 }

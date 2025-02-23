@@ -27,8 +27,13 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
+    
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
   
   data:
     redis:
@@ -50,6 +55,8 @@ springdoc:
     enabled: true
     path: /api/workspace/v3/api-docs
   swagger-ui:
+    csrf:
+      enabled: true
     enabled: true
     path: /api/workspace/swagger-ui.html
 
