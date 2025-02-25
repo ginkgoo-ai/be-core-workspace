@@ -87,14 +87,14 @@ public class WorkspaceController {
     public Workspace updateWorkspace(
             @PathVariable String id,
             @Valid @RequestBody WorkspaceUpdateRequest request,
-            @AuthenticationPrincipal UserInfo currentUser) {
-        return workspaceService.updateWorkspace(id, request, currentUser.getId());
+            @AuthenticationPrincipal Jwt jwt) {
+        return workspaceService.updateWorkspace(id, request, jwt.getSubject());
     }
 
     @DeleteMapping("/{id}")
     public void deleteWorkspace(
             @PathVariable String id,
-            @AuthenticationPrincipal UserInfo currentUser) {
-        workspaceService.deleteWorkspace(id, currentUser.getId());
+            @AuthenticationPrincipal Jwt jwt) {
+        workspaceService.deleteWorkspace(id, jwt.getSubject());
     }
 }
