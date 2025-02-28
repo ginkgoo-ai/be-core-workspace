@@ -1,4 +1,4 @@
-package com.ginkgooai.core.workspace.dto;
+package com.ginkgooai.core.workspace.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

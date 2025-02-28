@@ -1,4 +1,4 @@
-package com.ginkgooai.core.workspace.dto;
+package com.ginkgooai.core.workspace.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

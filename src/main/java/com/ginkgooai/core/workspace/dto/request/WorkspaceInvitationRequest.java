@@ -1,4 +1,4 @@
-package com.ginkgooai.core.workspace.dto;
+package com.ginkgooai.core.workspace.dto.request;
 
 import com.ginkgooai.core.workspace.domain.WorkspaceRole;
 import jakarta.validation.constraints.NotEmpty;

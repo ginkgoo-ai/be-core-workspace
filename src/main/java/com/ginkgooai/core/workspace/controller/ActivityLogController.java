@@ -1,9 +1,8 @@
 package com.ginkgooai.core.workspace.controller;
 
 import com.ginkgooai.core.common.bean.ActivityType;
-import com.ginkgooai.core.workspace.domain.ActivityLog;
-import com.ginkgooai.core.workspace.dto.ActivityLogResponse;
-import com.ginkgooai.core.workspace.dto.ActivityQueryRequest;
+import com.ginkgooai.core.workspace.dto.response.ActivityLogResponse;
+import com.ginkgooai.core.workspace.dto.request.ActivityQueryRequest;
 import com.ginkgooai.core.workspace.service.ActivityLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,21 +33,20 @@ public class ActivityLogController {
     @GetMapping
     @Operation(summary = "Search activity logs")
     @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'READ')")
-    public Page<ActivityLogResponse> searchActivityLogs(
-            @RequestParam(required = false) String workspaceId,
-            @RequestParam(required = false) String projectId,
-            @RequestParam(required = false) String applicationId,
-            @RequestParam(required = false) String activityType,
-            @RequestParam(required = false) String createdBy,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime startTime,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime endTime,
-            @ParameterObject Pageable pageable
+    public Page<ActivityLogResponse> searchActivityLogs(@RequestParam(required = false) String workspaceId,
+                                                        @RequestParam(required = false) String projectId,
+                                                        @RequestParam(required = false) String applicationId,
+                                                        @RequestParam(required = false) String activityType,
+                                                        @RequestParam(required = false) String createdBy,
+                                                        @RequestParam(required = false)
+                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                                                        LocalDateTime startTime,
+                                                        @RequestParam(required = false)
+                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                                                        LocalDateTime endTime,
+                                                        @ParameterObject Pageable pageable
     ) {
-        Page<ActivityLog> page = activityLogService.search(ActivityQueryRequest.builder()
+        Page<ActivityLogResponse> page = activityLogService.search(ActivityQueryRequest.builder()
                 .workspaceId(workspaceId)
                 .projectId(projectId)
                 .applicationId(applicationId)
@@ -58,7 +56,7 @@ public class ActivityLogController {
                 .endTime(endTime)
                 .build(), pageable);
 
-        return page.map(ActivityLogResponse::from);
+        return page;
     }
 
     @GetMapping("/types")
