@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -35,10 +36,12 @@ public class WorkspaceMember {
     @Column(name = "role", length = 20, nullable = false)
     private WorkspaceRole role;
 
-    @CreationTimestamp
-    @Column(name = "joined_at", nullable = false)
-    private LocalDateTime joinedAt;
-
     @Column(name = "last_accessed_at")
     private LocalDateTime lastAccessedAt;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

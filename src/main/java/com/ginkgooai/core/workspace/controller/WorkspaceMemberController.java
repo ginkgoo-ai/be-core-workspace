@@ -1,5 +1,6 @@
 package com.ginkgooai.core.workspace.controller;
 
+import com.ginkgooai.core.workspace.service.WorkspaceContextService;
 import com.ginkgooai.core.workspace.service.WorkspaceServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 public class WorkspaceMemberController {
     
     private final WorkspaceServiceImpl workspaceService;
+    
+    private final WorkspaceContextService workspaceContextService;
     
     private final HttpSession httpSession;
 
@@ -45,7 +48,6 @@ public class WorkspaceMemberController {
                                  @AuthenticationPrincipal Jwt jwt) {
 
         workspaceService.updateMemberLastAccess(workspaceId, jwt.getSubject());
-
-        httpSession.setAttribute("CURRENT_WORKSPACE_ID", workspaceId);
+        workspaceContextService.setUserWorkspaceContext(jwt.getSubject(), workspaceId);
     }
 }
