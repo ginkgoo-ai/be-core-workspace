@@ -1,7 +1,7 @@
 package com.ginkgooai.core.workspace.domain;
 
 import com.ginkgooai.core.common.bean.ActivityType;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -37,8 +37,8 @@ public class ActivityLog {
 
     private String createdBy;
 
-    @Type(JsonBinaryType.class)
-    @Column(columnDefinition = "jsonb")
+    @Type(JsonType.class)
+//    @Column(columnDefinition = "jsonb")
     private Map<String, Object> context;
     
     @CreationTimestamp
@@ -47,8 +47,8 @@ public class ActivityLog {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workspace_id", nullable = false)
-    private Workspace workspace;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "workspace_id", nullable = false)
+//    private Workspace workspace;
     
 }

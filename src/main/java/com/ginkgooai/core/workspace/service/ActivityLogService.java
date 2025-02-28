@@ -10,11 +10,8 @@ import com.ginkgooai.core.workspace.repository.ActivityLogRepository;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +34,7 @@ public class ActivityLogService {
     /**
      * Create activity log
      */
+    @Transactional
     public ActivityLog createLog(ActivityLogRequest request) {
         try {
             ActivityLog log = ActivityLog.builder()
@@ -62,11 +60,11 @@ public class ActivityLogService {
     /**
      * Batch create activity logs
      */
-    public List<ActivityLog> createLogs(List<ActivityLogRequest> requests) {
+    @Transactional
+    public List<ActivityLog> createLogs(List<ActivityLog> requests) {
         List<ActivityLog> logs = requests.stream()
                 .map(request -> ActivityLog.builder()
-                        .id(UUID.randomUUID().toString())
-                        .activityType(ActivityType.valueOf(request.getActivityType()))
+                        .activityType(request.getActivityType())
                         .description(request.getDescription())
                         .workspaceId(request.getWorkspaceId())
                         .projectId(request.getProjectId())
