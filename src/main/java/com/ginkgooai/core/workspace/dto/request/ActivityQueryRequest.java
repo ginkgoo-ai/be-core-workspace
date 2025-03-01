@@ -1,4 +1,4 @@
-package com.ginkgooai.core.workspace.dto;
+package com.ginkgooai.core.workspace.dto.request;
 
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +11,7 @@ public class ActivityQueryRequest {
     private String workspaceId;
     private String projectId;
     private String applicationId;
+    private String roleId;
     private String activityType;
     private String status;
     private String createdBy;

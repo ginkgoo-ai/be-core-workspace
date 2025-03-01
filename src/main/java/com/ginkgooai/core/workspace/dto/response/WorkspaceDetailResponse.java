@@ -1,4 +1,4 @@
-package com.ginkgooai.core.workspace.dto;
+package com.ginkgooai.core.workspace.dto.response;
 
 import com.ginkgooai.core.workspace.domain.Workspace;
 import lombok.Data;

@@ -22,6 +22,10 @@ public class UserInfo {
     
     private String lastName;
     
+    private String name;
+    
+    private String picture;
+    
     private boolean enabled;
     
     private Set<String> roles;
