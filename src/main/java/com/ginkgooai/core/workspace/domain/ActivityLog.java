@@ -36,9 +36,11 @@ public class ActivityLog {
     private String applicationId;
 
     @Type(JsonType.class)
+    @Column(columnDefinition = "jsonb")
     private Map<String, Object> variables;
 
     @Type(JsonType.class)
+    @Column(columnDefinition = "jsonb")
     private Map<String, Object> attachments;
 
     private String createdBy;

@@ -6,6 +6,7 @@ import com.ginkgooai.core.workspace.domain.Workspace;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceCreateRequest;
 import com.ginkgooai.core.workspace.dto.response.WorkspaceDetailResponse;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceUpdateRequest;
+import com.ginkgooai.core.workspace.service.WorkspaceContextService;
 import com.ginkgooai.core.workspace.service.WorkspaceServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,10 +14,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -35,6 +38,8 @@ public class WorkspaceController {
     UserClient userClient;
 
     private final WorkspaceServiceImpl workspaceService;
+    
+    private final WorkspaceContextService workspaceContextService;
 
     @PostMapping
     @Operation(
@@ -79,8 +84,19 @@ public class WorkspaceController {
             description = "List of workspaces",
             content = @Content(schema = @Schema(implementation = WorkspaceDetailResponse.class))
     )
-    public List<WorkspaceDetailResponse> getWorkspaces(@AuthenticationPrincipal Jwt jwt) {
-        return workspaceService.getWorkspacesByOwner(jwt.getSubject());
+    public List<WorkspaceDetailResponse> getWorkspaces(@AuthenticationPrincipal Jwt jwt,
+                                                       HttpServletResponse response) {
+        List<WorkspaceDetailResponse> workspaces = workspaceService.getWorkspacesByOwner(jwt.getSubject());
+
+        if (!ObjectUtils.isEmpty(workspaces.size())) {
+            //use redis to keep workspace id
+            workspaceContextService.setUserWorkspaceContext(jwt.getSubject(), workspaces.get(0).getId());
+
+            //use http header to spread workspace id
+//            response.setHeader(HttpHeaders.WORKSPACE_ID, workspaces.get(0).getId());
+        }
+        
+        return workspaces;
     }
 
     @PutMapping("/{id}")

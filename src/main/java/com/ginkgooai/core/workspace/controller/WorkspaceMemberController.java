@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,7 +14,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/workspaces/{workspaceId}/members")
+@RequestMapping("/workspaces")
 @RequiredArgsConstructor
 @Tag(name = "Workspace Members", description = "APIs for managing workspace members")
 public class WorkspaceMemberController {
@@ -23,8 +23,6 @@ public class WorkspaceMemberController {
     
     private final WorkspaceContextService workspaceContextService;
     
-    private final HttpSession httpSession;
-
     @Operation(
             summary = "Update member's last access time",
             description = "Updates the last access time for a specific member in the workspace"
@@ -41,13 +39,24 @@ public class WorkspaceMemberController {
             responseCode = "404",
             description = "Not Found - Workspace or user does not exist"
     )
-    @PatchMapping("/access")
+    @PatchMapping("/{workspaceId}/members/access")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateLastAccess(@Parameter(description = "Workspace ID")
                                  @PathVariable String workspaceId,
-                                 @AuthenticationPrincipal Jwt jwt) {
+                                 @AuthenticationPrincipal Jwt jwt,
+                                 HttpServletResponse response) {
 
         workspaceService.updateMemberLastAccess(workspaceId, jwt.getSubject());
         workspaceContextService.setUserWorkspaceContext(jwt.getSubject(), workspaceId);
+     
+        //use http header to spread workspace id
+//        response.setHeader(HttpHeaders.WORKSPACE_ID, workspaceId);
+    }
+
+    @GetMapping("/members/{userId}/default")
+    @Operation(summary = "Get current user's workspace context")
+    public String getCurrentWorkspaceId(@Parameter(description = "User ID")
+                                            @PathVariable String userId) {
+        return workspaceContextService.getUserWorkspaceContext(userId);
     }
 }
