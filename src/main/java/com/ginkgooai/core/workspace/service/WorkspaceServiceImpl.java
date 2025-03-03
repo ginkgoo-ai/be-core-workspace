@@ -47,6 +47,7 @@ public class WorkspaceServiceImpl {
         workspace.setDescription(request.getDescription());
         workspace.setOwnerId(userId);
         workspace.setLogoUrl(request.getLogoUrl());
+        workspace.setLogoFileId(request.getLogoFileId());
 
         WorkspaceMember ownerMember = new WorkspaceMember();
         ownerMember.setWorkspace(workspace);
@@ -83,8 +84,8 @@ public class WorkspaceServiceImpl {
 
         workspace.setName(request.getName());
         workspace.setDescription(request.getDescription());
+        workspace.setLogoFileId(request.getLogoFileId());
         workspace.setLogoUrl(request.getLogoUrl());
-        
         return workspaceRepository.save(workspace);
     }
 

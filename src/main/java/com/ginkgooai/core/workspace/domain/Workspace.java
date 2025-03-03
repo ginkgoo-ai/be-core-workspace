@@ -39,6 +39,9 @@ public class Workspace {
     @Column(name = "logo_url", length = 255)
     private String logoUrl;
 
+    @Column(name = "logo_file_id", length = 36)
+    private String logoFileId;
+
     @Column(name = "status", length = 20, nullable = false)
     @Enumerated(EnumType.STRING)
     private WorkspaceStatus status = WorkspaceStatus.ACTIVE;
