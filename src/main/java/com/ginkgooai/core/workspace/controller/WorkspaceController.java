@@ -33,13 +33,11 @@ import java.util.List;
 @Tag(name = "Workspace Management", description = "APIs for managing workspaces")
 @SecurityRequirement(name = "bearerAuth")
 public class WorkspaceController {
-    
-    @Autowired
-    UserClient userClient;
 
     private final WorkspaceServiceImpl workspaceService;
-    
     private final WorkspaceContextService workspaceContextService;
+    @Autowired
+    UserClient userClient;
 
     @PostMapping
     @Operation(
@@ -70,7 +68,7 @@ public class WorkspaceController {
     )
     public WorkspaceDetailResponse getWorkspace(@AuthenticationPrincipal Jwt jwt, @PathVariable String name) {
         UserInfo userInfo = userClient.getUserById(jwt.getSubject());
-        
+
         return workspaceService.getWorkspaceByName(name);
     }
 
@@ -89,28 +87,30 @@ public class WorkspaceController {
         List<WorkspaceDetailResponse> workspaces = workspaceService.getWorkspacesByOwner(jwt.getSubject());
 
         if (!ObjectUtils.isEmpty(workspaces.size())) {
-            //use redis to keep workspace id
-            workspaceContextService.setUserWorkspaceContext(jwt.getSubject(), workspaces.get(0).getId());
-
-            //use http header to spread workspace id
-//            response.setHeader(HttpHeaders.WORKSPACE_ID, workspaces.get(0).getId());
+            workspaceContextService.setUserWorkspaceContext(jwt.getSubject(), workspaces.stream().map(WorkspaceDetailResponse::getId).toList());
         }
-        
+
         return workspaces;
     }
 
     @PutMapping("/{id}")
-    public Workspace updateWorkspace(
-            @PathVariable String id,
-            @Valid @RequestBody WorkspaceUpdateRequest request,
-            @AuthenticationPrincipal Jwt jwt) {
+    public Workspace updateWorkspace(@PathVariable String id,
+                                     @Valid @RequestBody WorkspaceUpdateRequest request,
+                                     @AuthenticationPrincipal Jwt jwt) {
         return workspaceService.updateWorkspace(id, request, jwt.getSubject());
     }
 
     @DeleteMapping("/{id}")
-    public void deleteWorkspace(
-            @PathVariable String id,
-            @AuthenticationPrincipal Jwt jwt) {
+    public void deleteWorkspace(@PathVariable String id,
+                                @AuthenticationPrincipal Jwt jwt) {
         workspaceService.deleteWorkspace(id, jwt.getSubject());
     }
+    
+    @GetMapping("/{id}/validate")
+    public boolean validate(@PathVariable String id,
+                           @AuthenticationPrincipal Jwt jwt) {
+        return workspaceContextService.validateUserWorkspaceAccess(jwt.getSubject(), id);
+    }
+    
+    
 }

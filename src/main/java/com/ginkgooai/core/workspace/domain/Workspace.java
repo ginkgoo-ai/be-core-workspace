@@ -39,8 +39,16 @@ public class Workspace {
     @Column(name = "logo_url", length = 255)
     private String logoUrl;
 
-    @Column(name = "logo_file_id", length = 36)
-    private String logoFileId;
+    @Column(name = "secondary_logo_url", length = 255)
+    private String secondaryLogoUrl;
+
+    @Column(name = "portal_preview_logo_type", length = 20)
+    @Enumerated(EnumType.STRING)
+    private LogoType portalPreviewLogoType = LogoType.PRIMARY;
+    
+    @Column(name = "shortlist_preview_logo_type", length = 20)
+    @Enumerated(EnumType.STRING)
+    private LogoType shortlistPreviewLogoType = LogoType.PRIMARY;
 
     @Column(name = "status", length = 20, nullable = false)
     @Enumerated(EnumType.STRING)

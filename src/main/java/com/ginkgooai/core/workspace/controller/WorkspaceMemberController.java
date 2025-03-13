@@ -47,7 +47,7 @@ public class WorkspaceMemberController {
                                  HttpServletResponse response) {
 
         workspaceService.updateMemberLastAccess(workspaceId, jwt.getSubject());
-        workspaceContextService.setUserWorkspaceContext(jwt.getSubject(), workspaceId);
+//        workspaceContextService.setUserWorkspaceContext(jwt.getSubject(), workspaceId);
      
         //use http header to spread workspace id
 //        response.setHeader(HttpHeaders.WORKSPACE_ID, workspaceId);
