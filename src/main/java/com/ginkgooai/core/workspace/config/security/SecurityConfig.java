@@ -33,6 +33,9 @@ public class SecurityConfig {
                                 "/api/workspace/swagger-ui/**",
                                 "/webjars/**"
                         ).permitAll()
+                        .requestMatchers(
+                                "/workspaces/members/*/default"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

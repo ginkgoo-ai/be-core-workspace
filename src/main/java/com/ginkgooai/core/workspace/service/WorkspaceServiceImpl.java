@@ -33,11 +33,6 @@ public class WorkspaceServiceImpl {
 
     @Transactional
     public Workspace createWorkspace(WorkspaceCreateRequest request, String userId) {
-//        // 验证用户是否存在
-//        if (!userClient.validateUser(userId)) {
-//            throw new ResourceNotFoundException("Use", "userId", userId);
-//        }
-
         if (workspaceRepository.existsByNameAndOwnerId(request.getName(), userId)) {
             throw new ResourceDuplicatedException("Workspace", "name-userid", String.join("-", request.getName(), userId));
         }
@@ -47,7 +42,6 @@ public class WorkspaceServiceImpl {
         workspace.setDescription(request.getDescription());
         workspace.setOwnerId(userId);
         workspace.setLogoUrl(request.getLogoUrl());
-        workspace.setLogoFileId(request.getLogoFileId());
 
         WorkspaceMember ownerMember = new WorkspaceMember();
         ownerMember.setWorkspace(workspace);
@@ -84,8 +78,11 @@ public class WorkspaceServiceImpl {
 
         workspace.setName(request.getName());
         workspace.setDescription(request.getDescription());
-        workspace.setLogoFileId(request.getLogoFileId());
         workspace.setLogoUrl(request.getLogoUrl());
+        workspace.setSecondaryLogoUrl(request.getSecondaryLogoUrl());
+        workspace.setPortalPreviewLogoType(request.getPortalPreviewLogoType());
+        workspace.setShortlistPreviewLogoType(request.getShortlistPreviewLogoType());
+
         return workspaceRepository.save(workspace);
     }
 

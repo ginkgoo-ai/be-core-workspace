@@ -6,6 +6,7 @@ import com.ginkgooai.core.workspace.domain.Workspace;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceCreateRequest;
 import com.ginkgooai.core.workspace.dto.response.WorkspaceDetailResponse;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceUpdateRequest;
+import com.ginkgooai.core.workspace.service.WorkspaceContextService;
 import com.ginkgooai.core.workspace.service.WorkspaceServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,10 +14,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -30,11 +33,11 @@ import java.util.List;
 @Tag(name = "Workspace Management", description = "APIs for managing workspaces")
 @SecurityRequirement(name = "bearerAuth")
 public class WorkspaceController {
-    
-    @Autowired
-    UserClient userClient;
 
     private final WorkspaceServiceImpl workspaceService;
+    private final WorkspaceContextService workspaceContextService;
+    @Autowired
+    UserClient userClient;
 
     @PostMapping
     @Operation(
@@ -65,7 +68,7 @@ public class WorkspaceController {
     )
     public WorkspaceDetailResponse getWorkspace(@AuthenticationPrincipal Jwt jwt, @PathVariable String name) {
         UserInfo userInfo = userClient.getUserById(jwt.getSubject());
-        
+
         return workspaceService.getWorkspaceByName(name);
     }
 
@@ -79,22 +82,35 @@ public class WorkspaceController {
             description = "List of workspaces",
             content = @Content(schema = @Schema(implementation = WorkspaceDetailResponse.class))
     )
-    public List<WorkspaceDetailResponse> getWorkspaces(@AuthenticationPrincipal Jwt jwt) {
-        return workspaceService.getWorkspacesByOwner(jwt.getSubject());
+    public List<WorkspaceDetailResponse> getWorkspaces(@AuthenticationPrincipal Jwt jwt,
+                                                       HttpServletResponse response) {
+        List<WorkspaceDetailResponse> workspaces = workspaceService.getWorkspacesByOwner(jwt.getSubject());
+
+        if (!ObjectUtils.isEmpty(workspaces.size())) {
+            workspaceContextService.setUserWorkspaceContext(jwt.getSubject(), workspaces.stream().map(WorkspaceDetailResponse::getId).toList());
+        }
+
+        return workspaces;
     }
 
     @PutMapping("/{id}")
-    public Workspace updateWorkspace(
-            @PathVariable String id,
-            @Valid @RequestBody WorkspaceUpdateRequest request,
-            @AuthenticationPrincipal Jwt jwt) {
+    public Workspace updateWorkspace(@PathVariable String id,
+                                     @Valid @RequestBody WorkspaceUpdateRequest request,
+                                     @AuthenticationPrincipal Jwt jwt) {
         return workspaceService.updateWorkspace(id, request, jwt.getSubject());
     }
 
     @DeleteMapping("/{id}")
-    public void deleteWorkspace(
-            @PathVariable String id,
-            @AuthenticationPrincipal Jwt jwt) {
+    public void deleteWorkspace(@PathVariable String id,
+                                @AuthenticationPrincipal Jwt jwt) {
         workspaceService.deleteWorkspace(id, jwt.getSubject());
     }
+    
+    @GetMapping("/{id}/validate")
+    public boolean validate(@PathVariable String id,
+                           @AuthenticationPrincipal Jwt jwt) {
+        return workspaceContextService.validateUserWorkspaceAccess(jwt.getSubject(), id);
+    }
+    
+    
 }
