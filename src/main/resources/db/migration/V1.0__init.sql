@@ -1,7 +1,7 @@
 -- V1__Initial_Schema.sql
 
 -- Workspace table
-CREATE TABLE workspace (
+CREATE TABLE workspace.workspace (
                            id VARCHAR(36) NOT NULL PRIMARY KEY,
                            name VARCHAR(100) NOT NULL,
                            description VARCHAR(500),
@@ -15,11 +15,11 @@ CREATE TABLE workspace (
                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_workspace_created_at ON workspace (created_at);
-CREATE INDEX idx_workspace_owner_id ON workspace (owner_id);
+CREATE INDEX idx_workspace_created_at ON workspace.workspace (created_at);
+CREATE INDEX idx_workspace_owner_id ON workspace.workspace (owner_id);
 
 -- Workspace invitation table
-CREATE TABLE workspace_invitation (
+CREATE TABLE workspace.workspace_invitation (
                                       id VARCHAR(255) NOT NULL PRIMARY KEY,
                                       email VARCHAR(255) NOT NULL,
                                       workspace_id VARCHAR(36) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE workspace_invitation (
 );
 
 -- Workspace member table
-CREATE TABLE workspace_member (
+CREATE TABLE workspace.workspace_member (
                                   id VARCHAR(255) NOT NULL PRIMARY KEY,
                                   user_id VARCHAR(36) NOT NULL,
                                   workspace_id VARCHAR(36) NOT NULL,
@@ -44,11 +44,11 @@ CREATE TABLE workspace_member (
                                   UNIQUE (workspace_id, user_id)
 );
 
-CREATE INDEX idx_workspace_member_user_id ON workspace_member (user_id);
-CREATE INDEX idx_workspace_member_workspace_id ON workspace_member (workspace_id);
+CREATE INDEX idx_workspace_member_user_id ON workspace.workspace_member (user_id);
+CREATE INDEX idx_workspace_member_workspace_id ON workspace.workspace_member (workspace_id);
 
 -- Activity log table
-CREATE TABLE activity_log (
+CREATE TABLE workspace.activity_log (
                               id VARCHAR(36) NOT NULL PRIMARY KEY,
                               activity_type VARCHAR(100) NOT NULL,
                               description VARCHAR(500),
@@ -62,11 +62,11 @@ CREATE TABLE activity_log (
                               attachments JSONB
 );
 
-CREATE INDEX idx_activity_log_workspace_id ON activity_log (workspace_id);
-CREATE INDEX idx_activity_log_project_id ON activity_log (project_id);
-CREATE INDEX idx_activity_log_application_id ON activity_log (application_id);
-CREATE INDEX idx_activity_log_activity_type ON activity_log (activity_type);
-CREATE INDEX idx_activity_log_created_by ON activity_log (created_by);
-CREATE INDEX idx_activity_log_created_at ON activity_log (created_at);
-CREATE INDEX idx_activity_log_variables ON activity_log USING GIN (variables);
-CREATE INDEX idx_activity_log_attachments ON activity_log USING GIN (attachments);
+CREATE INDEX idx_activity_log_workspace_id ON workspace.activity_log (workspace_id);
+CREATE INDEX idx_activity_log_project_id ON workspace.activity_log (project_id);
+CREATE INDEX idx_activity_log_application_id ON workspace.activity_log (application_id);
+CREATE INDEX idx_activity_log_activity_type ON workspace.activity_log (activity_type);
+CREATE INDEX idx_activity_log_created_by ON workspace.activity_log (created_by);
+CREATE INDEX idx_activity_log_created_at ON workspace.activity_log (created_at);
+CREATE INDEX idx_activity_log_variables ON workspace.activity_log USING GIN (variables);
+CREATE INDEX idx_activity_log_attachments ON workspace.activity_log USING GIN (attachments);
