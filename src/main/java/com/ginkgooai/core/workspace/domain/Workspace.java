@@ -8,19 +8,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 @Getter
 @Setter
 @Entity
-@Table(
-        name = "workspace",
-        indexes = {
-                @Index(name = "idx_owner", columnList = "owner_id"),
-                @Index(name = "idx_createdat", columnList = "created_at")
-        }
-)
+@Table(name = "workspace")
 public class Workspace {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -65,27 +58,4 @@ public class Workspace {
     @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
 
-    public void addMember(String userId, WorkspaceRole role) {
-        WorkspaceMember member = new WorkspaceMember();
-        member.setWorkspace(this);
-        member.setUserId(userId);
-        member.setRole(role);
-        members.add(member);
-    }
-
-    public void removeMember(String userId) {
-        members.removeIf(member -> member.getUserId().equals(userId));
-    }
-
-    public boolean isMember(String userId) {
-        return members.stream()
-                .anyMatch(member -> member.getUserId().equals(userId));
-    }
-
-    public Optional<WorkspaceRole> getMemberRole(String userId) {
-        return members.stream()
-                .filter(member -> member.getUserId().equals(userId))
-                .map(WorkspaceMember::getRole)
-                .findFirst();
-    }
 }

@@ -9,15 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "workspace_member",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"workspace_id", "user_id"})
-    },
-    indexes = {
-        @Index(name = "idx_workspace_member_user", columnList = "user_id"),
-        @Index(name = "idx_workspace_member_workspace", columnList = "workspace_id")
-    }
-)
+@Table(name = "workspace_member")
 @Getter
 @Setter
 public class WorkspaceMember {
