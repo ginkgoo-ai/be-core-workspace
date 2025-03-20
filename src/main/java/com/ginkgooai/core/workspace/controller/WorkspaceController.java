@@ -8,6 +8,8 @@ import com.ginkgooai.core.workspace.dto.response.WorkspaceDetailResponse;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceUpdateRequest;
 import com.ginkgooai.core.workspace.service.WorkspaceContextService;
 import com.ginkgooai.core.workspace.service.WorkspaceServiceImpl;
+
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,8 +38,6 @@ public class WorkspaceController {
 
     private final WorkspaceServiceImpl workspaceService;
     private final WorkspaceContextService workspaceContextService;
-    @Autowired
-    UserClient userClient;
 
     @PostMapping
     @Operation(
@@ -66,9 +66,8 @@ public class WorkspaceController {
             description = "Workspace found",
             content = @Content(schema = @Schema(implementation = WorkspaceDetailResponse.class))
     )
+    @Hidden
     public WorkspaceDetailResponse getWorkspace(@AuthenticationPrincipal Jwt jwt, @PathVariable String name) {
-        UserInfo userInfo = userClient.getUserById(jwt.getSubject());
-
         return workspaceService.getWorkspaceByName(name);
     }
 
@@ -94,12 +93,30 @@ public class WorkspaceController {
     }
 
     @PutMapping("/{id}")
+    @Hidden
     public Workspace updateWorkspace(@PathVariable String id,
                                      @Valid @RequestBody WorkspaceUpdateRequest request,
                                      @AuthenticationPrincipal Jwt jwt) {
         return workspaceService.updateWorkspace(id, request, jwt.getSubject());
     }
 
+    @PatchMapping("/{id}")
+    @Operation(
+            summary = "Partially update workspace",
+            description = "Updates specific fields of an existing workspace"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Workspace updated successfully",
+            content = @Content(schema = @Schema(implementation = WorkspaceDetailResponse.class))
+    )
+    public WorkspaceDetailResponse partialUpdateWorkspace(
+            @PathVariable String id,
+            @Valid @RequestBody WorkspaceUpdateRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        Workspace workspace = workspaceService.partialUpdateWorkspace(id, request, jwt.getSubject());
+        return WorkspaceDetailResponse.from(workspace);
+    }
     @DeleteMapping("/{id}")
     public void deleteWorkspace(@PathVariable String id,
                                 @AuthenticationPrincipal Jwt jwt) {
@@ -107,6 +124,7 @@ public class WorkspaceController {
     }
     
     @GetMapping("/{id}/validate")
+    @Hidden
     public boolean validate(@PathVariable String id,
                            @AuthenticationPrincipal Jwt jwt) {
         return workspaceContextService.validateUserWorkspaceAccess(jwt.getSubject(), id);
