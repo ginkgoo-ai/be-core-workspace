@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/workspaces")
 @RequiredArgsConstructor
 @Tag(name = "Workspace Management", description = "APIs for managing workspaces")
-@SecurityRequirement(name = "bearerAuth")
 public class WorkspaceController {
 
     private final WorkspaceServiceImpl workspaceService;
