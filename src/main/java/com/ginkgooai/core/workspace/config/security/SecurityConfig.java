@@ -34,6 +34,9 @@ public class SecurityConfig {
                                 "/webjars/**"
                         ).permitAll()
                         .requestMatchers(
+                                "/health"
+                        ).permitAll()
+                        .requestMatchers(
                                 "/workspaces/members/*/default"
                         ).permitAll()
                         .anyRequest().authenticated()
