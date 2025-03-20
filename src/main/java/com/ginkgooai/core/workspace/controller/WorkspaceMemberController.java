@@ -1,5 +1,6 @@
 package com.ginkgooai.core.workspace.controller;
 
+import com.ginkgooai.core.common.utils.ContextUtils;
 import com.ginkgooai.core.workspace.service.WorkspaceContextService;
 import com.ginkgooai.core.workspace.service.WorkspaceServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,10 +44,9 @@ public class WorkspaceMemberController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateLastAccess(@Parameter(description = "Workspace ID")
                                  @PathVariable String workspaceId,
-                                 @AuthenticationPrincipal Jwt jwt,
                                  HttpServletResponse response) {
 
-        workspaceService.updateMemberLastAccess(workspaceId, jwt.getSubject());
+        workspaceService.updateMemberLastAccess(workspaceId, ContextUtils.getUserId());
 //        workspaceContextService.setUserWorkspaceContext(jwt.getSubject(), workspaceId);
      
         //use http header to spread workspace id
