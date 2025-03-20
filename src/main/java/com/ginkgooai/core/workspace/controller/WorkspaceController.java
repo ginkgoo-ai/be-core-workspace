@@ -1,13 +1,12 @@
 package com.ginkgooai.core.workspace.controller;
 
 import com.ginkgooai.core.common.utils.ContextUtils;
-import com.ginkgooai.core.workspace.client.identity.UserClient;
-import com.ginkgooai.core.workspace.client.identity.dto.UserInfo;
 import com.ginkgooai.core.workspace.domain.Workspace;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceCreateRequest;
 import com.ginkgooai.core.workspace.dto.request.WorkspacePatchRequest;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceUpdateRequest;
-import com.ginkgooai.core.workspace.dto.response.WorkspaceDetailResponse;
+import com.ginkgooai.core.workspace.dto.response.WorkspaceResponse;
+import com.ginkgooai.core.workspace.dto.response.WorkspaceSettingResponse;
 import com.ginkgooai.core.workspace.service.WorkspaceContextService;
 import com.ginkgooai.core.workspace.service.WorkspaceServiceImpl;
 
@@ -21,11 +20,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -46,12 +45,12 @@ public class WorkspaceController {
     @ApiResponse(
             responseCode = "200",
             description = "Workspace created successfully",
-            content = @Content(schema = @Schema(implementation = WorkspaceDetailResponse.class))
+            content = @Content(schema = @Schema(implementation = WorkspaceSettingResponse.class))
     )
-    public WorkspaceDetailResponse createWorkspace(
+    public WorkspaceSettingResponse createWorkspace(
             @Valid @RequestBody WorkspaceCreateRequest request) {
         Workspace workspace = workspaceService.createWorkspace(request, ContextUtils.getUserId());
-        return WorkspaceDetailResponse.from(workspace);
+        return WorkspaceSettingResponse.from(workspace);
     }
 
     @GetMapping("/{name}")
@@ -62,11 +61,29 @@ public class WorkspaceController {
     @ApiResponse(
             responseCode = "200",
             description = "Workspace found",
-            content = @Content(schema = @Schema(implementation = WorkspaceDetailResponse.class))
+            content = @Content(schema = @Schema(implementation = WorkspaceSettingResponse.class))
     )
     @Hidden
-    public WorkspaceDetailResponse getWorkspace(@PathVariable String name) {
+    public WorkspaceSettingResponse getWorkspace(@PathVariable String name) {
         return workspaceService.getWorkspaceByName(name);
+    }
+
+    @GetMapping("/current")
+    @Operation(
+            summary = "Get current workspace details for setting",
+            description = "Retrieves the setting details of currently logged in workspace"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Current workspace setting details retrieved successfully",
+            content = @Content(schema = @Schema(implementation = WorkspaceSettingResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "Current workspace not found"
+    )
+    public WorkspaceSettingResponse getCurrentWorkspace() {
+        return WorkspaceSettingResponse.from(workspaceService.getCurrentWorkspace());
     }
 
     @GetMapping
@@ -77,16 +94,16 @@ public class WorkspaceController {
     @ApiResponse(
             responseCode = "200",
             description = "List of workspaces",
-            content = @Content(schema = @Schema(implementation = WorkspaceDetailResponse.class))
+            content = @Content(schema = @Schema(implementation = WorkspaceSettingResponse.class))
     )
-    public List<WorkspaceDetailResponse> getWorkspaces(HttpServletResponse response) {
-        List<WorkspaceDetailResponse> workspaces = workspaceService.getWorkspacesByOwner(ContextUtils.getUserId());
+    public List<WorkspaceResponse> getWorkspaces(HttpServletResponse response) {
+        List<Workspace> workspaces = workspaceService.getWorkspacesByOwner(ContextUtils.getUserId());
 
         if (!ObjectUtils.isEmpty(workspaces.size())) {
-            workspaceContextService.setUserWorkspaceContext(ContextUtils.getUserId(), workspaces.stream().map(WorkspaceDetailResponse::getId).toList());
+            workspaceContextService.setUserWorkspaceContext(ContextUtils.getUserId(), workspaces.stream().map(Workspace::getId).toList());
         }
 
-        return workspaces;
+        return workspaces.stream().map(WorkspaceResponse::from).collect(Collectors.toList());
     }
 
     @PutMapping("/{id}")
@@ -104,13 +121,13 @@ public class WorkspaceController {
     @ApiResponse(
             responseCode = "200",
             description = "Workspace updated successfully",
-            content = @Content(schema = @Schema(implementation = WorkspaceDetailResponse.class))
+            content = @Content(schema = @Schema(implementation = WorkspaceSettingResponse.class))
     )
-    public WorkspaceDetailResponse partialUpdateWorkspace(
+    public WorkspaceSettingResponse partialUpdateWorkspace(
             @PathVariable String id,
             @Valid @RequestBody WorkspacePatchRequest request) {
         Workspace workspace = workspaceService.partialUpdateWorkspace(id, request, ContextUtils.getUserId());
-        return WorkspaceDetailResponse.from(workspace);
+        return WorkspaceSettingResponse.from(workspace);
     }
     @DeleteMapping("/{id}")
     public void deleteWorkspace(@PathVariable String id) {

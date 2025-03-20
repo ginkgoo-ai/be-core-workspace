@@ -2,14 +2,15 @@ package com.ginkgooai.core.workspace.service;
 
 import com.ginkgooai.core.common.exception.ResourceDuplicatedException;
 import com.ginkgooai.core.common.exception.ResourceNotFoundException;
+import com.ginkgooai.core.common.utils.ContextUtils;
 import com.ginkgooai.core.workspace.client.identity.UserClient;
 import com.ginkgooai.core.workspace.client.identity.dto.UserInfo;
 import com.ginkgooai.core.workspace.domain.*;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceCreateRequest;
 import com.ginkgooai.core.workspace.dto.request.WorkspacePatchRequest;
-import com.ginkgooai.core.workspace.dto.response.WorkspaceDetailResponse;
-import com.ginkgooai.core.workspace.dto.request.WorkspaceInvitationRequest;
+import com.ginkgooai.core.workspace.dto.response.WorkspaceSettingResponse;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceUpdateRequest;
+import com.ginkgooai.core.workspace.dto.response.WorkspaceResponse;
 import com.ginkgooai.core.workspace.repository.WorkspaceInvitationRepository;
 import com.ginkgooai.core.workspace.repository.WorkspaceMemberRepository;
 import com.ginkgooai.core.workspace.repository.WorkspaceRepository;
@@ -51,21 +52,24 @@ public class WorkspaceServiceImpl {
         return workspaceRepository.save(workspace);
     }
 
-    public WorkspaceDetailResponse getWorkspaceByName(String name) {
+    public WorkspaceSettingResponse getWorkspaceByName(String name) {
         Workspace workspace = workspaceRepository.findById(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Workspace", "name", name));
         
         UserInfo owner = userClient.getUserById(workspace.getOwnerId()).getBody();
         
-        return WorkspaceDetailResponse.from(workspace);
+        return WorkspaceSettingResponse.from(workspace);
     }
 
-    public List<WorkspaceDetailResponse> getWorkspacesByOwner(String userId) {
-        List<Workspace> workspaces = workspaceRepository.findActiveWorkspacesByOwnerId(userId);
-        
-        return workspaces.stream()
-                .map(workspace -> WorkspaceDetailResponse.from(workspace))
-                .toList();
+    public Workspace getCurrentWorkspace() {
+        Workspace workspace = workspaceRepository.findByIdAndOwnerId(ContextUtils.getWorkspaceId(), ContextUtils.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("Workspace", "workspaceId:userId", String.join(":", ContextUtils.getWorkspaceId(), ContextUtils.getUserId())));
+
+        return workspace;
+    }
+
+    public List<Workspace> getWorkspacesByOwner(String userId) {
+        return workspaceRepository.findActiveWorkspacesByOwnerId(userId);
     }
 
     @Transactional
