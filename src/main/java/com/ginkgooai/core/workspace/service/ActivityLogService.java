@@ -141,7 +141,7 @@ public class ActivityLogService {
      * Convert ActivityLog to ActivityLogResponse with enhanced information
      */
     private ActivityLogResponse convertToResponse(ActivityLog log) {
-        UserInfo userInfo = userClient.getUserById(log.getCreatedBy());
+        UserInfo userInfo = userClient.getUserById(log.getCreatedBy()).getBody();
         String timeAgo = TimeUtils.getTimeAgo(log.getCreatedAt());
 
         Map<String, Object> variables = log.getVariables();

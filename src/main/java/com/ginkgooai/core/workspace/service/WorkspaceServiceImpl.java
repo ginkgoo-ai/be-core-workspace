@@ -54,14 +54,13 @@ public class WorkspaceServiceImpl {
         Workspace workspace = workspaceRepository.findById(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Workspace", "name", name));
         
-        UserInfo owner = userClient.getUserById(workspace.getOwnerId());
+        UserInfo owner = userClient.getUserById(workspace.getOwnerId()).getBody();
         
         return WorkspaceDetailResponse.from(workspace);
     }
 
     public List<WorkspaceDetailResponse> getWorkspacesByOwner(String userId) {
         List<Workspace> workspaces = workspaceRepository.findActiveWorkspacesByOwnerId(userId);
-        UserInfo owner = userClient.getUserById(userId);
         
         return workspaces.stream()
                 .map(workspace -> WorkspaceDetailResponse.from(workspace))
