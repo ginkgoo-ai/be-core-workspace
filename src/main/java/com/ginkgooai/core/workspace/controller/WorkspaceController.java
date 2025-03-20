@@ -5,6 +5,7 @@ import com.ginkgooai.core.workspace.client.identity.UserClient;
 import com.ginkgooai.core.workspace.client.identity.dto.UserInfo;
 import com.ginkgooai.core.workspace.domain.Workspace;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceCreateRequest;
+import com.ginkgooai.core.workspace.dto.request.WorkspacePatchRequest;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceUpdateRequest;
 import com.ginkgooai.core.workspace.dto.response.WorkspaceDetailResponse;
 import com.ginkgooai.core.workspace.service.WorkspaceContextService;
@@ -107,7 +108,7 @@ public class WorkspaceController {
     )
     public WorkspaceDetailResponse partialUpdateWorkspace(
             @PathVariable String id,
-            @Valid @RequestBody WorkspaceUpdateRequest request) {
+            @Valid @RequestBody WorkspacePatchRequest request) {
         Workspace workspace = workspaceService.partialUpdateWorkspace(id, request, ContextUtils.getUserId());
         return WorkspaceDetailResponse.from(workspace);
     }

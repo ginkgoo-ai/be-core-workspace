@@ -6,6 +6,7 @@ import com.ginkgooai.core.workspace.client.identity.UserClient;
 import com.ginkgooai.core.workspace.client.identity.dto.UserInfo;
 import com.ginkgooai.core.workspace.domain.*;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceCreateRequest;
+import com.ginkgooai.core.workspace.dto.request.WorkspacePatchRequest;
 import com.ginkgooai.core.workspace.dto.response.WorkspaceDetailResponse;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceInvitationRequest;
 import com.ginkgooai.core.workspace.dto.request.WorkspaceUpdateRequest;
@@ -102,7 +103,7 @@ public class WorkspaceServiceImpl {
     }
 
     @Transactional
-    public Workspace partialUpdateWorkspace(String id, WorkspaceUpdateRequest request, String userId) {
+    public Workspace partialUpdateWorkspace(String id, WorkspacePatchRequest request, String userId) {
         Workspace workspace = workspaceRepository.findByIdAndOwnerId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Workspace", "userId", userId));
 
