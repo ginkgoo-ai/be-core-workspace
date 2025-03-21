@@ -2,13 +2,12 @@ package com.ginkgooai.core.workspace.activityconsumer;
 
 import com.ginkgooai.core.common.bean.ActivityType;
 import com.ginkgooai.core.common.message.ActivityLogMessage;
+import com.ginkgooai.core.common.queue.QueueInterface;
 import com.ginkgooai.core.workspace.domain.ActivityLog;
 import com.ginkgooai.core.workspace.service.ActivityLogService;
 import com.ginkgooai.core.workspace.service.WorkspaceContextService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RQueue;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -26,7 +25,7 @@ public class ActivityLogConsumer {
 
     private static final String ACTIVITY_LOG_QUEUE = "activity_log_queue";
 
-    private final RedissonClient redissonClient;
+    private final QueueInterface queueInterface;
     private final ActivityLogService activityLogService;
     private final WorkspaceContextService workspaceContextService;
 
@@ -46,9 +45,8 @@ public class ActivityLogConsumer {
      */
     @Scheduled(fixedDelayString = "${activity.log.consumer.polling-interval:1000}")
     public void consumeActivityLogs() {
-        RQueue<ActivityLogMessage> queue = redissonClient.getQueue(ACTIVITY_LOG_QUEUE);
 
-        List<ActivityLogMessage> batch = queue.poll(batchSize);
+        List<ActivityLogMessage> batch =  queueInterface.getMessages(ACTIVITY_LOG_QUEUE, batchSize, ActivityLogMessage.class);
         if (!ObjectUtils.isEmpty(batch)) {
             processBatch(batch);
         }
