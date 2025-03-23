@@ -1,6 +1,7 @@
 package com.ginkgooai.core.workspace.controller;
 
 import com.ginkgooai.core.common.bean.ActivityType;
+import com.ginkgooai.core.common.utils.ContextUtils;
 import com.ginkgooai.core.workspace.dto.response.ActivityLogResponse;
 import com.ginkgooai.core.workspace.dto.request.ActivityQueryRequest;
 import com.ginkgooai.core.workspace.service.ActivityLogService;
@@ -12,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -32,9 +35,7 @@ public class ActivityLogController {
 
     @GetMapping
     @Operation(summary = "Search activity logs")
-    @PreAuthorize("hasPermission(#workspaceId, 'WORKSPACE', 'READ')")
-    public Page<ActivityLogResponse> searchActivityLogs(@RequestParam(required = false) String workspaceId,
-                                                        @RequestParam(required = false) String projectId,
+    public Page<ActivityLogResponse> searchActivityLogs(@RequestParam(required = false) String projectId,
                                                         @RequestParam(required = false) String applicationId,
                                                         @RequestParam(required = false) String activityType,
                                                         @RequestParam(required = false) String createdBy,
@@ -46,8 +47,12 @@ public class ActivityLogController {
                                                         LocalDateTime endTime,
                                                         @ParameterObject Pageable pageable
     ) {
+        if (ObjectUtils.isEmpty(ContextUtils.getWorkspaceId())) {
+            throw new AuthorizationDeniedException("No workspace chosen");
+        }
+        
         Page<ActivityLogResponse> page = activityLogService.search(ActivityQueryRequest.builder()
-                .workspaceId(workspaceId)
+                .workspaceId(ContextUtils.getWorkspaceId())
                 .projectId(projectId)
                 .applicationId(applicationId)
                 .activityType(activityType)
