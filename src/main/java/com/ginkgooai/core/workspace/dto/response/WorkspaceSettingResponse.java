@@ -1,11 +1,14 @@
 package com.ginkgooai.core.workspace.dto.response;
 
+import com.ginkgooai.core.common.constant.ContextsConstant;
+import com.ginkgooai.core.common.utils.ContextUtils;
 import com.ginkgooai.core.workspace.domain.LogoType;
 import com.ginkgooai.core.workspace.domain.Workspace;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Schema(description = "Response containing workspace settings and configuration details")
@@ -57,11 +60,20 @@ public class WorkspaceSettingResponse {
     private LocalDateTime updatedAt;
 
     public static WorkspaceSettingResponse from(Workspace workspace) {
+        List<String> role = ContextUtils.get().get(ContextsConstant.USER_ROLE, List.class);
+       
+        String logoUrl;
+        if (role.size() == 1 && role.get(0).equals("ROLE_GUEST")) {
+           logoUrl = workspace.getShortlistPreviewLogoType() == LogoType.PRIMARY ? workspace.getLogoUrl() : workspace.getSecondaryLogoUrl();
+        } else {
+           logoUrl = workspace.getPortalPreviewLogoType() == LogoType.PRIMARY ? workspace.getLogoUrl() : workspace.getSecondaryLogoUrl();
+        }
+        
         WorkspaceSettingResponse response = new WorkspaceSettingResponse();
         response.setId(workspace.getId());
         response.setName(workspace.getName());
         response.setDescription(workspace.getDescription());
-        response.setLogoUrl(workspace.getPortalPreviewLogoType() == LogoType.PRIMARY ? workspace.getLogoUrl() : workspace.getSecondaryLogoUrl());
+        response.setLogoUrl(logoUrl);
         response.setPrimaryLogoUrl(workspace.getLogoUrl());
         response.setSecondaryLogoUrl(workspace.getSecondaryLogoUrl());
         response.setPortalPreviewLogoType(workspace.getPortalPreviewLogoType());
