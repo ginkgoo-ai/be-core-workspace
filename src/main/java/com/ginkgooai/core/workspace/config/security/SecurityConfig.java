@@ -37,9 +37,10 @@ public class SecurityConfig {
                                 "/health"
                         ).permitAll()
                         .requestMatchers(
+                                "/workspaces/current",
                                 "/workspaces/members/*/default"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                        ).authenticated()
+                        .anyRequest().hasRole("USER")
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
