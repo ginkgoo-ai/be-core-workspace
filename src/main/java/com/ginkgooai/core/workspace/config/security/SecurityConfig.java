@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -15,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -51,26 +53,48 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
 
         jwtConverter.setPrincipalClaimName("email");
         jwtConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            String email = jwt.getClaimAsString("email");
-            String sub = jwt.getClaimAsString("sub");
-
-            UserInfo userInfo = new UserInfo();
-            userInfo.setId(sub);
-            userInfo.setEmail(email);
-
             Collection<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            List<String> roles = getClaimAsList(jwt, "role");
+            if (roles != null) {
+                for (String role : roles) {
+                    authorities.add(new SimpleGrantedAuthority(role.toUpperCase()));
+                }
+            }
+
+            List<String> scopes = getClaimAsList(jwt, "scope");
+            if (scopes != null) {
+                for (String scope : scopes) {
+                    authorities.add(new SimpleGrantedAuthority(scope));
+                }
+            }
 
             return authorities;
         });
 
         return jwtConverter;
+    }
+
+    private List<String> getClaimAsList(Jwt jwt, String claimName) {
+        Object claimValue = jwt.getClaim(claimName);
+
+        if (claimValue == null) {
+            return null;
+        }
+
+        if (claimValue instanceof List) {
+            return (List<String>) claimValue;
+        }
+
+        if (claimValue instanceof String) {
+            return List.of(((String) claimValue).split(" "));
+        }
+
+        return null;
     }
 
     @Bean
