@@ -93,7 +93,7 @@ public class WorkspaceController {
     @ApiResponse(
             responseCode = "200",
             description = "List of workspaces",
-            content = @Content(schema = @Schema(implementation = WorkspaceSettingResponse.class))
+            content = @Content(schema = @Schema(implementation = WorkspaceResponse.class))
     )
     public List<WorkspaceResponse> getWorkspaces(HttpServletResponse response) {
         List<Workspace> workspaces = workspaceService.getWorkspacesByOwner(ContextUtils.getUserId());

@@ -62,8 +62,8 @@ public class WorkspaceServiceImpl {
     }
 
     public Workspace getCurrentWorkspace() {
-        Workspace workspace = workspaceRepository.findByIdAndOwnerId(ContextUtils.getWorkspaceId(), ContextUtils.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("Workspace", "workspaceId:userId", String.join(":", ContextUtils.getWorkspaceId(), ContextUtils.getUserId())));
+        Workspace workspace = workspaceRepository.findById(ContextUtils.getWorkspaceId())
+                .orElseThrow(() -> new ResourceNotFoundException("Workspace", "workspaceId", ContextUtils.getWorkspaceId()));
 
         return workspace;
     }
