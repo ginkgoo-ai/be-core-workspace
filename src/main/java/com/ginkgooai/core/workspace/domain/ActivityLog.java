@@ -4,21 +4,19 @@ import com.ginkgooai.core.common.bean.ActivityType;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Getter
 @Setter
-@Entity
-@Builder
+@SuperBuilder 
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @Table(name = "activity_log")
-public class ActivityLog {
+public class ActivityLog extends BaseAuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -42,17 +40,4 @@ public class ActivityLog {
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private Map<String, Object> attachments;
-
-    private String createdBy;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "workspace_id", nullable = false)
-//    private Workspace workspace;
-    
 }

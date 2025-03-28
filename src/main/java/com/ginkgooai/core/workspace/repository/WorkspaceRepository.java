@@ -10,14 +10,12 @@ import java.util.Optional;
 
 @Repository
 public interface WorkspaceRepository extends JpaRepository<Workspace, String> {
-    List<Workspace> findByOwnerId(String ownerId);
+    List<Workspace> findByCreatedBy(String ownerId);
     
-    Optional<Workspace> findByIdAndOwnerId(String id, String ownerId);
+    Optional<Workspace> findByIdAndCreatedBy(String id, String ownerId);
     
-    Optional<Workspace> findByName(String name);
-    
-    @Query("SELECT w FROM Workspace w WHERE w.ownerId = :ownerId AND w.status = 'ACTIVE'")
+    @Query("SELECT w FROM Workspace w WHERE w.createdBy = :ownerId AND w.status = 'ACTIVE'")
     List<Workspace> findActiveWorkspacesByOwnerId(String ownerId);
     
-    boolean existsByNameAndOwnerId(String name, String ownerId);
+    boolean existsByNameAndCreatedBy(String name, String ownerId);
 }

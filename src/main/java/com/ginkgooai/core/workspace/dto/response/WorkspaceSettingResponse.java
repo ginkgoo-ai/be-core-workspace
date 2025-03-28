@@ -49,7 +49,7 @@ public class WorkspaceSettingResponse {
     
     @Schema(description = "ID of the workspace owner", 
             example = "user-67890")
-    private String ownerId;
+    private String createdBy;
     
     @Schema(description = "Timestamp when the workspace was created", 
             example = "2025-03-01T14:30:00")
@@ -78,7 +78,7 @@ public class WorkspaceSettingResponse {
         response.setSecondaryLogoUrl(workspace.getSecondaryLogoUrl());
         response.setPortalPreviewLogoType(workspace.getPortalPreviewLogoType());
         response.setShortlistPreviewLogoType(workspace.getShortlistPreviewLogoType());
-        response.setOwnerId(workspace.getOwnerId());
+        response.setCreatedBy(workspace.getCreatedBy());
         response.setCreatedAt(workspace.getCreatedAt());
         response.setUpdatedAt(workspace.getUpdatedAt());
         return response;

@@ -42,8 +42,11 @@ public class SecurityConfig {
                                 "/workspaces/current",
                                 "/workspaces/members/*/default"
                         ).authenticated()
-                        .anyRequest().hasRole("USER")
+                        .anyRequest().authenticated()
                 )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(new ProblemDetailsAuthenticationEntryPoint())
+                        .accessDeniedHandler(new ProblemDetailsAuthenticationEntryPoint()))
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())

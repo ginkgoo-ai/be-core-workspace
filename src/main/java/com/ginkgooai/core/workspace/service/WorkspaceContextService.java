@@ -112,7 +112,7 @@ public class WorkspaceContextService {
      */
     private List<String> autoSetUserWorkspaceContext(String userId) {
         // Get all workspaces for the user
-        List<Workspace> userWorkspaceIds = workspaceRepository.findByOwnerId(userId);
+        List<Workspace> userWorkspaceIds = workspaceRepository.findByCreatedBy(userId);
         
         if (userWorkspaceIds.isEmpty()) {
             log.warn("User {} has no workspaces", userId);

@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -50,21 +49,6 @@ public class WorkspaceController {
             @Valid @RequestBody WorkspaceCreateRequest request) {
         Workspace workspace = workspaceService.createWorkspace(request, ContextUtils.getUserId());
         return WorkspaceSettingResponse.from(workspace);
-    }
-
-    @GetMapping("/{name}")
-    @Operation(
-            summary = "Get workspace by name",
-            description = "Retrieves a workspace by its name"
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Workspace found",
-            content = @Content(schema = @Schema(implementation = WorkspaceSettingResponse.class))
-    )
-    @Hidden
-    public WorkspaceSettingResponse getWorkspace(@PathVariable String name) {
-        return workspaceService.getWorkspaceByName(name);
     }
 
     @GetMapping("/current")
