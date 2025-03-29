@@ -2,19 +2,24 @@ package com.ginkgooai.core.workspace.controller;
 
 import com.ginkgooai.core.common.bean.ActivityType;
 import com.ginkgooai.core.common.utils.ContextUtils;
-import com.ginkgooai.core.workspace.dto.response.ActivityLogResponse;
 import com.ginkgooai.core.workspace.dto.request.ActivityQueryRequest;
+import com.ginkgooai.core.workspace.dto.response.ActivityLogResponse;
 import com.ginkgooai.core.workspace.service.ActivityLogService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -44,30 +49,35 @@ public class ActivityLogController {
                                                         @RequestParam(required = false)
                                                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                                                         LocalDateTime endTime,
-                                                        @ParameterObject Pageable pageable
-    ) {
+                                                        @Parameter(description = "Page number (zero-based)", example = "0") @RequestParam(defaultValue = "0") int page,
+                                                        @Parameter(description = "Page size", example = "10") @RequestParam(defaultValue = "10") int size,
+                                                        @Parameter(description = "Sort direction (ASC/DESC)", example = "DESC") @RequestParam(defaultValue = "DESC") String sortDirection,
+                                                        @Parameter(description = "Sort field (e.g., updatedAt)", example = "updatedAt") @RequestParam(defaultValue = "updatedAt") String sortField) {
         if (ObjectUtils.isEmpty(ContextUtils.getWorkspaceId())) {
             throw new AuthorizationDeniedException("No workspace chosen");
         }
-        
-        Page<ActivityLogResponse> page = activityLogService.search(ActivityQueryRequest.builder()
-                .workspaceId(ContextUtils.getWorkspaceId())
-                .projectId(projectId)
-                .applicationId(applicationId)
-                .activityType(activityType)
-                .createdBy(createdBy)
-                .startTime(startTime)
-                .endTime(endTime)
-                .build(), pageable);
 
-        return page;
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<ActivityLogResponse> pageResult = activityLogService.search(ActivityQueryRequest.builder()
+            .workspaceId(ContextUtils.getWorkspaceId())
+            .projectId(projectId)
+            .applicationId(applicationId)
+            .activityType(activityType)
+            .createdBy(createdBy)
+            .startTime(startTime)
+            .endTime(endTime)
+            .build(), pageable);
+
+        return pageResult;
     }
 
     @GetMapping("/types")
     @Operation(summary = "Get all activity types")
     public List<String> getActivityTypes() {
         return Arrays.stream(ActivityType.values())
-                .map(ActivityType::name)
-                .collect(Collectors.toList());
+            .map(ActivityType::name)
+            .collect(Collectors.toList());
     }
 }
