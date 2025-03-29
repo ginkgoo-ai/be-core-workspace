@@ -9,6 +9,6 @@ public class SpringSecurityAuditorAware implements AuditorAware<String> {
 
     @Override
     public Optional<String> getCurrentAuditor() {
-        return Optional.ofNullable(ContextUtils.getUserId()).or(() -> Optional.of("system"));
+        return Optional.ofNullable(ContextUtils.getUserId());
     }
 }
