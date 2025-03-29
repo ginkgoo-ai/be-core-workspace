@@ -20,7 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -162,7 +165,7 @@ public class ActivityLogService {
                 .timeAgo(timeAgo)
                 .userInfo(ActivityLogResponse.UserInfo.builder()
                         .id(userInfo.getId())
-                        .name(userInfo.getLastName())
+                    .name(userInfo.getName())
                         .picture(userInfo.getPicture())
                         .build())
                 .build();
