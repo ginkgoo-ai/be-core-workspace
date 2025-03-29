@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -144,9 +145,12 @@ public class ActivityLogService {
      * Convert ActivityLog to ActivityLogResponse with enhanced information
      */
     private ActivityLogResponse convertToResponse(ActivityLog log) {
-        UserInfo userInfo = userClient.getUserById(log.getCreatedBy()).getBody();
+        UserInfo userInfo = new UserInfo();
+        if (!ObjectUtils.isEmpty(log.getCreatedBy())) {
+            userInfo = userClient.getUserById(log.getCreatedBy()).getBody();
+        }
+        
         String timeAgo = TimeUtils.getTimeAgo(log.getCreatedAt());
-
         Map<String, Object> variables = log.getVariables();
         variables.put("user", userInfo.getName());
         String description = formatActivityDescription(log.getDescription(), log.getVariables());
