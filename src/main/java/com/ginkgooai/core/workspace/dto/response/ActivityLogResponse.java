@@ -1,6 +1,6 @@
 package com.ginkgooai.core.workspace.dto.response;
 
-import com.ginkgooai.core.common.bean.ActivityType;
+import com.ginkgooai.core.common.enums.ActivityType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;

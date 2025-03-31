@@ -1,6 +1,6 @@
 package com.ginkgooai.core.workspace.activityconsumer;
 
-import com.ginkgooai.core.common.bean.ActivityType;
+import com.ginkgooai.core.common.enums.ActivityType;
 import com.ginkgooai.core.common.message.ActivityLogMessage;
 import com.ginkgooai.core.common.queue.QueueInterface;
 import com.ginkgooai.core.workspace.domain.ActivityLog;

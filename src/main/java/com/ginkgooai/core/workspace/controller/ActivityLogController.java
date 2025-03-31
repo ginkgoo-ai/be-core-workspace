@@ -1,6 +1,6 @@
 package com.ginkgooai.core.workspace.controller;
 
-import com.ginkgooai.core.common.bean.ActivityType;
+import com.ginkgooai.core.common.enums.ActivityType;
 import com.ginkgooai.core.common.utils.ContextUtils;
 import com.ginkgooai.core.workspace.dto.request.ActivityQueryRequest;
 import com.ginkgooai.core.workspace.dto.response.ActivityLogResponse;
