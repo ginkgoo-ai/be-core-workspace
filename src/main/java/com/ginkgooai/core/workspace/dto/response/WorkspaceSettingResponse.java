@@ -63,7 +63,7 @@ public class WorkspaceSettingResponse {
         List<String> role = ContextUtils.get().get(ContextsConstant.USER_ROLE, List.class);
        
         String logoUrl;
-        if (role.size() == 1 && role.get(0).equals("ROLE_GUEST")) {
+        if (role.size() == 1 && !role.get(0).equals("ROLE_USER")) {
            logoUrl = workspace.getShortlistPreviewLogoType() == LogoType.PRIMARY ? workspace.getLogoUrl() : workspace.getSecondaryLogoUrl();
         } else {
            logoUrl = workspace.getPortalPreviewLogoType() == LogoType.PRIMARY ? workspace.getLogoUrl() : workspace.getSecondaryLogoUrl();
