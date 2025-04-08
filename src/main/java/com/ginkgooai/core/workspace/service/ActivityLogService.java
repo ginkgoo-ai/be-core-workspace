@@ -1,6 +1,7 @@
 package com.ginkgooai.core.workspace.service;
 
 import com.ginkgooai.core.common.enums.ActivityType;
+import com.ginkgooai.core.common.exception.RemoteServiceException;
 import com.ginkgooai.core.common.exception.ResourceNotFoundException;
 import com.ginkgooai.core.common.utils.TimeUtils;
 import com.ginkgooai.core.workspace.client.identity.UserClient;
@@ -21,10 +22,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -144,28 +142,32 @@ public class ActivityLogService {
     /**
      * Convert ActivityLog to ActivityLogResponse with enhanced information
      */
-    private ActivityLogResponse convertToResponse(ActivityLog log) {
+    private ActivityLogResponse convertToResponse(ActivityLog activityLog) {
         UserInfo userInfo = new UserInfo();
-        if (!ObjectUtils.isEmpty(log.getCreatedBy())) {
-            userInfo = userClient.getUserById(log.getCreatedBy()).getBody();
+        if (!ObjectUtils.isEmpty(activityLog.getCreatedBy())) {
+            try {
+                userInfo = userClient.getUserById(activityLog.getCreatedBy()).getBody();
+            } catch (RemoteServiceException e) {
+                log.error("Error fetching user info: {}", e.getMessage());
+            }
         }
-        
-        String timeAgo = TimeUtils.getTimeAgo(log.getCreatedAt());
-        Map<String, Object> variables = log.getVariables();
-        variables.put("user", userInfo.getName());
-        String description = formatActivityDescription(log.getDescription(), log.getVariables());
+
+        String timeAgo = TimeUtils.getTimeAgo(activityLog.getCreatedAt());
+        Map<String, Object> variables = activityLog.getVariables();
+        variables.put("user", Optional.ofNullable(userInfo.getName()).orElse("unknown"));
+        String description = formatActivityDescription(activityLog.getDescription(), activityLog.getVariables());
 
         return ActivityLogResponse.builder()
-                .id(log.getId())
-                .activityType(log.getActivityType())
+            .id(activityLog.getId())
+            .activityType(activityLog.getActivityType())
                 .description(description)
-                .workspaceId(log.getWorkspaceId())
-                .projectId(log.getProjectId())
-                .applicationId(log.getApplicationId())
-                .variables(log.getVariables())
-                .attachments(log.getAttachments())
-                .createdBy(log.getCreatedBy())
-                .createdAt(log.getCreatedAt())
+            .workspaceId(activityLog.getWorkspaceId())
+            .projectId(activityLog.getProjectId())
+            .applicationId(activityLog.getApplicationId())
+            .variables(activityLog.getVariables())
+            .attachments(activityLog.getAttachments())
+            .createdBy(activityLog.getCreatedBy())
+            .createdAt(activityLog.getCreatedAt())
                 .timeAgo(timeAgo)
                 .userInfo(ActivityLogResponse.UserInfo.builder()
                         .id(userInfo.getId())
