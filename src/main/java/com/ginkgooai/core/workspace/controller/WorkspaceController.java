@@ -8,7 +8,7 @@ import com.ginkgooai.core.workspace.dto.request.WorkspaceUpdateRequest;
 import com.ginkgooai.core.workspace.dto.response.WorkspaceResponse;
 import com.ginkgooai.core.workspace.dto.response.WorkspaceSettingResponse;
 import com.ginkgooai.core.workspace.service.WorkspaceContextService;
-import com.ginkgooai.core.workspace.service.WorkspaceService;
+import com.ginkgooai.core.workspace.service.WorkspaceServiceImpl;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,44 +34,58 @@ import java.util.stream.Collectors;
 @Tag(name = "Workspace Management", description = "APIs for managing workspaces")
 public class WorkspaceController {
 
-    private final WorkspaceService workspaceService;
+    private final WorkspaceServiceImpl workspaceService;
     private final WorkspaceContextService workspaceContextService;
 
     @PostMapping
-    @Operation(summary = "Create a new workspace",
-        description = "Creates a new workspace for the authenticated user")
-    @ApiResponse(responseCode = "200", description = "Workspace created successfully",
-        content = @Content(schema = @Schema(implementation = WorkspaceSettingResponse.class)))
+    @Operation(
+        summary = "Create a new workspace",
+        description = "Creates a new workspace for the authenticated user"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Workspace created successfully",
+        content = @Content(schema = @Schema(implementation = WorkspaceSettingResponse.class))
+    )
     public WorkspaceSettingResponse createWorkspace(
-            @Valid @RequestBody WorkspaceCreateRequest request) {
-        throw new UnsupportedOperationException(
-            "createWorkspace needs correct service method call");
+        @Valid @RequestBody WorkspaceCreateRequest request) {
+        Workspace workspace = workspaceService.createWorkspace(request, ContextUtils.getUserId());
+        return WorkspaceSettingResponse.from(workspace);
     }
 
     @GetMapping("/current")
-    @Operation(summary = "Get current workspace details for setting",
-        description = "Retrieves the setting details of currently logged in workspace")
-    @ApiResponse(responseCode = "200",
-            description = "Current workspace setting details retrieved successfully",
-        content = @Content(schema = @Schema(implementation = WorkspaceSettingResponse.class)))
-    @ApiResponse(responseCode = "404", description = "Current workspace not found")
+    @Operation(
+        summary = "Get current workspace details for setting",
+        description = "Retrieves the setting details of currently logged in workspace"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Current workspace setting details retrieved successfully",
+        content = @Content(schema = @Schema(implementation = WorkspaceSettingResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Current workspace not found"
+    )
     public WorkspaceSettingResponse getCurrentWorkspace() {
-        throw new UnsupportedOperationException(
-            "getCurrentWorkspace needs correct service method call");
+        return WorkspaceSettingResponse.from(workspaceService.getCurrentWorkspace());
     }
 
     @GetMapping
-    @Operation(summary = "Get all workspaces",
-        description = "Retrieves all workspaces owned by the authenticated user")
-    @ApiResponse(responseCode = "200", description = "List of workspaces",
-        content = @Content(schema = @Schema(implementation = WorkspaceResponse.class)))
+    @Operation(
+        summary = "Get all workspaces",
+        description = "Retrieves all workspaces owned by the authenticated user"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "List of workspaces",
+        content = @Content(schema = @Schema(implementation = WorkspaceResponse.class))
+    )
     public List<WorkspaceResponse> getWorkspaces(HttpServletResponse response) {
-        List<Workspace> workspaces = workspaceService.getUserWorkspaces().stream()
-            .map(dto -> new Workspace()).collect(Collectors.toList());
+        List<Workspace> workspaces = workspaceService.getWorkspacesByOwner(ContextUtils.getUserId());
 
-        if (!ObjectUtils.isEmpty(workspaces)) {
-            workspaceContextService.setUserWorkspaceContext(ContextUtils.getUserId(),
-                workspaces.stream().map(Workspace::getId).toList());
+        if (!ObjectUtils.isEmpty(workspaces.size())) {
+            workspaceContextService.setUserWorkspaceContext(ContextUtils.getUserId(), workspaces.stream().map(Workspace::getId).toList());
         }
 
         return workspaces.stream().map(WorkspaceResponse::from).collect(Collectors.toList());
@@ -79,26 +93,30 @@ public class WorkspaceController {
 
     @PutMapping("/{id}")
     @Hidden
-    public WorkspaceResponse updateWorkspace(@PathVariable String id,
-                                             @Valid @RequestBody WorkspaceUpdateRequest request) {
-        throw new UnsupportedOperationException(
-            "updateWorkspace needs correct service method call");
+    public Workspace updateWorkspace(@PathVariable String id,
+                                     @Valid @RequestBody WorkspaceUpdateRequest request) {
+        return workspaceService.updateWorkspace(id, request, ContextUtils.getUserId());
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "Partially update workspace",
-        description = "Updates specific fields of an existing workspace")
-    @ApiResponse(responseCode = "200", description = "Workspace updated successfully",
-        content = @Content(schema = @Schema(implementation = WorkspaceSettingResponse.class)))
-    public WorkspaceSettingResponse partialUpdateWorkspace(@PathVariable String id,
-            @Valid @RequestBody WorkspacePatchRequest request) {
-        throw new UnsupportedOperationException(
-            "partialUpdateWorkspace needs correct service method call");
+    @Operation(
+        summary = "Partially update workspace",
+        description = "Updates specific fields of an existing workspace"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Workspace updated successfully",
+        content = @Content(schema = @Schema(implementation = WorkspaceSettingResponse.class))
+    )
+    public WorkspaceSettingResponse partialUpdateWorkspace(
+        @PathVariable String id,
+        @Valid @RequestBody WorkspacePatchRequest request) {
+        Workspace workspace = workspaceService.partialUpdateWorkspace(id, request, ContextUtils.getUserId());
+        return WorkspaceSettingResponse.from(workspace);
     }
-
     @DeleteMapping("/{id}")
     public void deleteWorkspace(@PathVariable String id) {
-        workspaceService.deleteWorkspace(id);
+        workspaceService.deleteWorkspace(id, ContextUtils.getUserId());
     }
 
     @GetMapping("/{id}/validate")
