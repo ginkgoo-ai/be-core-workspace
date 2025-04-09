@@ -3,12 +3,6 @@ package com.ginkgooai.core.workspace.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -22,6 +16,8 @@ public class Workspace extends BaseAuditableEntity {
     private String name;
 
     private String description;
+
+    private String domain;
 
     private String logoUrl;
 

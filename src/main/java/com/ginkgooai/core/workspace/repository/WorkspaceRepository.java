@@ -18,4 +18,8 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, String> {
     List<Workspace> findActiveWorkspacesByOwnerId(String ownerId);
     
     boolean existsByNameAndCreatedBy(String name, String ownerId);
+
+    Optional<Workspace> findByDomain(String domain);
+
+    boolean existsByDomain(String domain);
 }

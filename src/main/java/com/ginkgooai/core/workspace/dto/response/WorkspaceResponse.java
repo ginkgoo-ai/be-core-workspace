@@ -23,6 +23,9 @@ public class WorkspaceResponse {
     @Schema(description = "Name of the workspace", example = "Production Studio")
     private String name;
 
+    @Schema(description = "Domain of the workspace", example = "production-studio")
+    private String domain;
+
     @Schema(description = "Description of the workspace", example = "Main production workspace for film projects")
     private String description;
 
@@ -54,6 +57,7 @@ public class WorkspaceResponse {
         return WorkspaceResponse.builder()
                 .id(workspace.getId())
                 .name(workspace.getName())
+            .domain(workspace.getDomain())
                 .description(workspace.getDescription())
                 .status(workspace.getStatus().name())
                 .logoUrl(workspace.getPortalPreviewLogoType() == LogoType.PRIMARY ? workspace.getLogoUrl() : workspace.getSecondaryLogoUrl())
