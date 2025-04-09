@@ -53,6 +53,11 @@ public class WorkspaceServiceImpl {
         return workspace;
     }
 
+    @Transactional(readOnly = true)
+    public boolean checkDomainAvailability(String domain) {
+        return !workspaceRepository.existsByDomain(domain);
+    }
+
     public List<Workspace> getWorkspacesByOwner(String userId) {
         return workspaceRepository.findActiveWorkspacesByOwnerId(userId);
     }
