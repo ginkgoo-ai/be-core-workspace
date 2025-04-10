@@ -62,7 +62,6 @@ public class ActivityLogController {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<ActivityLogResponse> pageResult = activityLogService.search(ActivityQueryRequest.builder()
-            .workspaceId(ContextUtils.getWorkspaceId())
             .projectId(projectId)
             .applicationId(applicationId)
             .activityType(activityType)
