@@ -183,4 +183,47 @@ public class ActivityLogService {
     public void deleteLog(String id) {
         activityLogRepository.deleteById(id);
     }
+
+    public long countActivityLogs(String workspaceId,
+                                  LocalDateTime startTime,
+                                  LocalDateTime endTime,
+                                  String projectId,
+                                  String applicationId,
+                                  String activityType) {
+
+        Specification<ActivityLog> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(cb.equal(root.get("workspaceId"), workspaceId));
+
+            if (startTime != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), startTime));
+            }
+
+            if (endTime != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), endTime));
+            }
+
+            if (StringUtils.hasText(projectId)) {
+                predicates.add(cb.equal(root.get("projectId"), projectId));
+            }
+
+            if (StringUtils.hasText(applicationId)) {
+                predicates.add(cb.equal(root.get("applicationId"), applicationId));
+            }
+
+            if (StringUtils.hasText(activityType)) {
+                try {
+                    ActivityType type = ActivityType.valueOf(activityType);
+                    predicates.add(cb.equal(root.get("activityType"), type));
+                } catch (IllegalArgumentException e) {
+                    log.warn("Invalid activity type: {}", activityType);
+                }
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return activityLogRepository.count(spec);
+    }
 }

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -80,4 +81,43 @@ public class ActivityLogController {
             .map(ActivityType::name)
             .collect(Collectors.toList());
     }
+
+    // ... 现有代码 ...
+
+    @GetMapping("/count")
+    @Operation(summary = "Count activity logs by time range")
+    public Map<String, Long> countActivityLogs(@RequestParam(required = false) String projectId,
+                                               @RequestParam(required = false) String applicationId,
+                                               @RequestParam(required = false) String activityType,
+                                               @RequestParam(required = false)
+                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                                               LocalDateTime startTime,
+                                               @RequestParam(required = false)
+                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                                               LocalDateTime endTime) {
+
+        if (ObjectUtils.isEmpty(ContextUtils.getWorkspaceId())) {
+            throw new AuthorizationDeniedException("No workspace chosen");
+        }
+
+        if (startTime == null) {
+            startTime = LocalDateTime.now().minusDays(1);
+        }
+
+        if (endTime == null) {
+            endTime = LocalDateTime.now();
+        }
+
+        long count = activityLogService.countActivityLogs(
+            ContextUtils.getWorkspaceId(),
+            startTime,
+            endTime,
+            projectId,
+            applicationId,
+            activityType
+        );
+
+        return Map.of("count", count);
+    }
+
 }
