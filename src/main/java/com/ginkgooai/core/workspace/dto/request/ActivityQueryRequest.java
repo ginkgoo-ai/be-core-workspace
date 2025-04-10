@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class ActivityQueryRequest {
-    private String workspaceId;
+    //    private String workspaceId;
     private String projectId;
     private String applicationId;
     private String roleId;

@@ -83,10 +83,6 @@ public class ActivityLogService {
         Specification<ActivityLog> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (StringUtils.hasText(searchRequest.getWorkspaceId())) {
-                predicates.add(cb.equal(root.get("workspaceId"), searchRequest.getWorkspaceId()));
-            }
-
             if (StringUtils.hasText(searchRequest.getProjectId())) {
                 predicates.add(cb.equal(root.get("projectId"), searchRequest.getProjectId()));
             }
