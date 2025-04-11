@@ -3,6 +3,7 @@ package com.ginkgooai.core.workspace.service;
 import com.ginkgooai.core.common.enums.ActivityType;
 import com.ginkgooai.core.common.exception.RemoteServiceException;
 import com.ginkgooai.core.common.exception.ResourceNotFoundException;
+import com.ginkgooai.core.common.utils.ContextUtils;
 import com.ginkgooai.core.common.utils.TimeUtils;
 import com.ginkgooai.core.workspace.client.identity.UserClient;
 import com.ginkgooai.core.workspace.client.identity.dto.UserInfo;
@@ -83,6 +84,7 @@ public class ActivityLogService {
         Specification<ActivityLog> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            predicates.add(cb.equal(root.get("workspaceId"), ContextUtils.getWorkspaceId()));
             if (StringUtils.hasText(searchRequest.getProjectId())) {
                 predicates.add(cb.equal(root.get("projectId"), searchRequest.getProjectId()));
             }
