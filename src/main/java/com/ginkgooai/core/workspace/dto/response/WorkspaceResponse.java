@@ -57,7 +57,7 @@ public class WorkspaceResponse {
         return WorkspaceResponse.builder()
                 .id(workspace.getId())
                 .name(workspace.getName())
-            .domain(workspace.getDomain())
+			.domain(workspace.getDomain())
                 .description(workspace.getDescription())
                 .status(workspace.getStatus().name())
                 .logoUrl(workspace.getPortalPreviewLogoType() == LogoType.PRIMARY ? workspace.getLogoUrl() : workspace.getSecondaryLogoUrl())

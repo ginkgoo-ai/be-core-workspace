@@ -34,6 +34,7 @@ public class WorkspaceServiceImpl {
 
         Workspace workspace = new Workspace();
         workspace.setName(request.getName());
+		workspace.setDomain(request.getDomain());
         workspace.setDescription(request.getDescription());
         workspace.setLogoUrl(request.getLogoUrl());
 
