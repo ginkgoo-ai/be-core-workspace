@@ -23,9 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Activity log query API
@@ -75,10 +74,14 @@ public class ActivityLogController {
 
     @GetMapping("/types")
     @Operation(summary = "Get all activity types")
-    public List<String> getActivityTypes() {
-        return Arrays.stream(ActivityType.values())
-            .map(ActivityType::name)
-            .collect(Collectors.toList());
+	public Map<String, String> getActivityTypes() {
+		Map<String, String> activityTypesMap = new HashMap<>();
+
+		Arrays.stream(ActivityType.values()).forEach(activityType -> {
+			activityTypesMap.put(activityType.name(), activityType.getDescription());
+		});
+
+		return activityTypesMap;
     }
 
 
