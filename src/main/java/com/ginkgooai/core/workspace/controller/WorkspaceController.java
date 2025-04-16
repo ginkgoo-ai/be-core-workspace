@@ -50,7 +50,7 @@ public class WorkspaceController {
     public WorkspaceSettingResponse createWorkspace(
         @Valid @RequestBody WorkspaceCreateRequest request) {
         Workspace workspace = workspaceService.createWorkspace(request, ContextUtils.getUserId());
-        return WorkspaceSettingResponse.from(workspace);
+		return WorkspaceSettingResponse.from(workspace, request.getLogoUrl());
     }
 
     @GetMapping("/current")
@@ -112,7 +112,7 @@ public class WorkspaceController {
         @PathVariable String id,
         @Valid @RequestBody WorkspacePatchRequest request) {
         Workspace workspace = workspaceService.partialUpdateWorkspace(id, request, ContextUtils.getUserId());
-        return WorkspaceSettingResponse.from(workspace);
+		return WorkspaceSettingResponse.from(workspace, request.getLogoUrl());
     }
     @DeleteMapping("/{id}")
     public void deleteWorkspace(@PathVariable String id) {

@@ -8,8 +8,7 @@ import lombok.Data;
 @Data
 public class WorkspaceCreateRequest {
     @Schema(description = "Name of the workspace", example = "My Workspace", required = true)
-    @Pattern(regexp = "^[a-zA-Z0-9\\s\\-_&@.]{3,50}$",
-        message = "Name must be 3-50 characters long and can only contain letters, numbers, spaces and common symbols (-_&@.)")
+	@Pattern(regexp = "^.{3,50}$", message = "Name must be 3-50 characters long")
     private String name;
 
     @Schema(description = "Domain identifier for the workspace (must be unique)",

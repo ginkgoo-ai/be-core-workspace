@@ -63,6 +63,23 @@ public class WorkspaceSettingResponse {
         example = "2025-03-15T09:45:00")
     private LocalDateTime updatedAt;
 
+	public static WorkspaceSettingResponse from(Workspace workspace, String logoUrl) {
+		WorkspaceSettingResponse response = new WorkspaceSettingResponse();
+		response.setId(workspace.getId());
+		response.setName(workspace.getName());
+		response.setDomain(workspace.getDomain());
+		response.setDescription(workspace.getDescription());
+		response.setLogoUrl(logoUrl);
+		response.setPrimaryLogoUrl(workspace.getLogoUrl());
+		response.setSecondaryLogoUrl(workspace.getSecondaryLogoUrl());
+		response.setPortalPreviewLogoType(workspace.getPortalPreviewLogoType());
+		response.setShortlistPreviewLogoType(workspace.getShortlistPreviewLogoType());
+		response.setCreatedBy(workspace.getCreatedBy());
+		response.setCreatedAt(workspace.getCreatedAt());
+		response.setUpdatedAt(workspace.getUpdatedAt());
+		return response;
+	}
+
     public static WorkspaceSettingResponse from(Workspace workspace) {
         List<String> role = ContextUtils.get().get(ContextsConstant.USER_ROLE, List.class);
 
@@ -73,19 +90,6 @@ public class WorkspaceSettingResponse {
             logoUrl = workspace.getPortalPreviewLogoType() == LogoType.PRIMARY ? workspace.getLogoUrl() : workspace.getSecondaryLogoUrl();
         }
 
-        WorkspaceSettingResponse response = new WorkspaceSettingResponse();
-        response.setId(workspace.getId());
-        response.setName(workspace.getName());
-        response.setDomain(workspace.getDomain());
-        response.setDescription(workspace.getDescription());
-        response.setLogoUrl(logoUrl);
-        response.setPrimaryLogoUrl(workspace.getLogoUrl());
-        response.setSecondaryLogoUrl(workspace.getSecondaryLogoUrl());
-        response.setPortalPreviewLogoType(workspace.getPortalPreviewLogoType());
-        response.setShortlistPreviewLogoType(workspace.getShortlistPreviewLogoType());
-        response.setCreatedBy(workspace.getCreatedBy());
-        response.setCreatedAt(workspace.getCreatedAt());
-        response.setUpdatedAt(workspace.getUpdatedAt());
-        return response;
+		return from(workspace, logoUrl);
     }
 }
