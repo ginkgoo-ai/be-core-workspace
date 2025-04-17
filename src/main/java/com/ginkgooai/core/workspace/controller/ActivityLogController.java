@@ -35,45 +35,43 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ActivityLogController {
 
-    private final ActivityLogService activityLogService;
+	private final ActivityLogService activityLogService;
 
-    @GetMapping
-    @Operation(summary = "Search activity logs")
-    public Page<ActivityLogResponse> searchActivityLogs(@RequestParam(required = false) String projectId,
-                                                        @RequestParam(required = false) String applicationId,
-                                                        @RequestParam(required = false) String activityType,
-                                                        @RequestParam(required = false) String createdBy,
-                                                        @RequestParam(required = false)
-                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                                                        LocalDateTime startTime,
-                                                        @RequestParam(required = false)
-                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                                                        LocalDateTime endTime,
-                                                        @Parameter(description = "Page number (zero-based)", example = "0") @RequestParam(defaultValue = "0") int page,
-                                                        @Parameter(description = "Page size", example = "10") @RequestParam(defaultValue = "10") int size,
-                                                        @Parameter(description = "Sort direction (ASC/DESC)", example = "DESC") @RequestParam(defaultValue = "DESC") String sortDirection,
-                                                        @Parameter(description = "Sort field (e.g., updatedAt)", example = "updatedAt") @RequestParam(defaultValue = "createdAt") String sortField) {
-        if (ObjectUtils.isEmpty(ContextUtils.getWorkspaceId())) {
-            throw new AuthorizationDeniedException("No workspace chosen");
-        }
+	@GetMapping
+	@Operation(summary = "Search activity logs")
+	public Page<ActivityLogResponse> searchActivityLogs(@RequestParam(required = false) String projectId,
+			@RequestParam(required = false) String applicationId, @RequestParam(required = false) String activityType,
+			@RequestParam(required = false) String createdBy,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
+			@Parameter(description = "Page number (zero-based)",
+					example = "0") @RequestParam(defaultValue = "0") int page,
+			@Parameter(description = "Page size", example = "10") @RequestParam(defaultValue = "10") int size,
+			@Parameter(description = "Sort direction (ASC/DESC)",
+					example = "DESC") @RequestParam(defaultValue = "DESC") String sortDirection,
+			@Parameter(description = "Sort field (e.g., updatedAt)",
+					example = "updatedAt") @RequestParam(defaultValue = "createdAt") String sortField) {
+		if (ObjectUtils.isEmpty(ContextUtils.getWorkspaceId())) {
+			throw new AuthorizationDeniedException("No workspace chosen");
+		}
 
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
-        Pageable pageable = PageRequest.of(page, size, sort);
+		Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+		Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<ActivityLogResponse> pageResult = activityLogService.search(ActivityQueryRequest.builder()
-            .projectId(projectId)
-            .applicationId(applicationId)
-            .activityType(activityType)
-            .createdBy(createdBy)
-            .startTime(startTime)
-            .endTime(endTime)
-            .build(), pageable);
+		Page<ActivityLogResponse> pageResult = activityLogService.search(ActivityQueryRequest.builder()
+			.projectId(projectId)
+			.applicationId(applicationId)
+			.activityType(activityType)
+			.createdBy(createdBy)
+			.startTime(startTime)
+			.endTime(endTime)
+			.build(), pageable);
 
-        return pageResult;
-    }
+		return pageResult;
+	}
 
-    @GetMapping("/types")
-    @Operation(summary = "Get all activity types")
+	@GetMapping("/types")
+	@Operation(summary = "Get all activity types")
 	public Map<String, String> getActivityTypes() {
 		Map<String, String> activityTypesMap = new HashMap<>();
 
@@ -82,43 +80,31 @@ public class ActivityLogController {
 		});
 
 		return activityTypesMap;
-    }
+	}
 
+	@GetMapping("/count")
+	@Operation(summary = "Count activity logs by time range")
+	public Map<String, Long> countActivityLogs(@RequestParam(required = false) String projectId,
+			@RequestParam(required = false) String applicationId, @RequestParam(required = false) String activityType,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
 
-    @GetMapping("/count")
-    @Operation(summary = "Count activity logs by time range")
-    public Map<String, Long> countActivityLogs(@RequestParam(required = false) String projectId,
-                                               @RequestParam(required = false) String applicationId,
-                                               @RequestParam(required = false) String activityType,
-                                               @RequestParam(required = false)
-                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                                               LocalDateTime startTime,
-                                               @RequestParam(required = false)
-                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                                               LocalDateTime endTime) {
+		if (ObjectUtils.isEmpty(ContextUtils.getWorkspaceId())) {
+			throw new AuthorizationDeniedException("No workspace chosen");
+		}
 
-        if (ObjectUtils.isEmpty(ContextUtils.getWorkspaceId())) {
-            throw new AuthorizationDeniedException("No workspace chosen");
-        }
+		if (startTime == null) {
+			startTime = LocalDateTime.now().minusDays(1);
+		}
 
-        if (startTime == null) {
-            startTime = LocalDateTime.now().minusDays(1);
-        }
+		if (endTime == null) {
+			endTime = LocalDateTime.now();
+		}
 
-        if (endTime == null) {
-            endTime = LocalDateTime.now();
-        }
+		long count = activityLogService.countActivityLogs(ContextUtils.getWorkspaceId(), startTime, endTime, projectId,
+				applicationId, activityType);
 
-        long count = activityLogService.countActivityLogs(
-            ContextUtils.getWorkspaceId(),
-            startTime,
-            endTime,
-            projectId,
-            applicationId,
-            activityType
-        );
-
-        return Map.of("count", count);
-    }
+		return Map.of("count", count);
+	}
 
 }
